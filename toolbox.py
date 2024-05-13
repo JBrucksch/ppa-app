@@ -44,7 +44,7 @@ def create_demand_timeseries(demand):
     yearly_demand_timeseries = np.tile(hourly_demand, days_per_year)
 
     #load csv file from input_data folder
-    orig_hourly_demand = pd.read_csv(r'input_data\power_hourly_braeuer15.csv', header=None)
+    orig_hourly_demand = pd.read_csv('power_hourly_braeuer15.csv', header=None)
 
     # rescale so that the sum of the demand is the same as the total demand
     yearly_demand_timeseries = orig_hourly_demand * total_demand / orig_hourly_demand.sum()
@@ -54,7 +54,7 @@ def create_demand_timeseries(demand):
 
 def get_irradiance(lat, lon, size, tech):
 
-    f = open("input_data\weather_data.pkl", "rb")
+    f = open("weather_data.pkl", "rb")
     weather_data = pickle.load(f)
     f.close()
 
