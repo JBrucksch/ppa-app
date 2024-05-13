@@ -4,6 +4,8 @@ numpy
 pandas
 dash_leaflet
 dash_daq
-pickle
 math
 json
+copy
+io
+base64
