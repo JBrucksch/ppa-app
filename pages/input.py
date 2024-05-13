@@ -12,12 +12,22 @@ def input_info():
         iconAnchor=[22.5, 36],
     )
     return html.Div([
+        dbc.Alert([
+            html.H2("Start configuring the PPA Portfolio!", className="alert-heading"),
+            html.P(
+            "Start selecting locations in the map and giving contract details to that PPA on the right hand site. "
+            "Addionally, configure the battery and other settings. Please make sure to create or upload a load profile."
+            ),],
+            color='info',
+            id="alert-1",
+            is_open=True,
+            dismissable=True,
+            style={"position": "absolute", "top": "10%", "left": "50%", "transform": "translateX(-50%)", "width": "60%", "z-index": "9999"},
+            fade=True,
+        ),
         dbc.Row([
             dbc.Col(
                 [
-                    # dbc.Row([
-                    #     html.Div("PPA Map", style={"fontWeight": "bold"})
-                    # ]),
                     dl.Map(id="PPA-map",
                            children=[dl.TileLayer(),
                                      dl.LayerGroup(id="marker-layer", children=[]),
@@ -393,6 +403,14 @@ def input_info():
         html.Div(style={"marginBottom": "1em"}),
 
         html.Div([
+            html.Div(
+                "Created by: Jonas Brucksch ", id="credits", className='cal-row', style={
+                    "marginBottom": "1em", 
+                    "fontFamily": "Arial",  # Change the font family to Courier New
+                    "fontStyle": "italic",       # Make the font italic
+                    "fontWeight": "bold",
+                    "fontSize": "20px", 
+                    }),
             html.Div(
                 "This data has been made available for commercial and non-commercial purposes under "
                 "CC4.0-BY. Cite this website as source in any derived works.", id="cite", className='cal-row'),
