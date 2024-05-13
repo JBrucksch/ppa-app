@@ -19,6 +19,8 @@ import copy
 app = dash.Dash(__name__, suppress_callback_exceptions=True,
            external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP])
 
+server = app.server
+
 app.title = 'PPA-APP'
 
 #######################################################################################################################
