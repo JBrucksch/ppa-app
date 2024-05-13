@@ -4,4 +4,4 @@ numpy
 pandas
 dash_leaflet
 dash_daq
-
+gunicorn==19.7.1
