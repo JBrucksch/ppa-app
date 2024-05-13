@@ -8,7 +8,6 @@ from toolbox import *
 from plotly.subplots import make_subplots
 import dash_leaflet as dl
 import dash._callback_context as ctx
-from app import app
 from pages.header import header_info
 from pages.readme import readme_info
 from pages.input import input_info
@@ -16,6 +15,9 @@ from pages.output import output_info
 import base64
 import io
 import copy
+
+app = dash.Dash(__name__, suppress_callback_exceptions=True,
+           external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP])
 
 app.title = 'PPA-APP'
 
