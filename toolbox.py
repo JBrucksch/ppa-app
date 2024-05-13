@@ -461,7 +461,7 @@ def get_optimization_result(input_dict, t_horizon, pp_data, load_profile, ps_boo
     df_to_save = pd.DataFrame({'load': load_profile, 'pv': energy_from_ppa_df['pv'], 'wind': energy_from_ppa_df['wind'], 
                                'to_bat': energy_to_battery_ts, 'from_bat': energy_from_battery_ts, 'to_grid': energy_to_grid_ts})
     # save that df
-    df_to_save.to_excel('results.xlsx')
+    #df_to_save.to_excel('results.xlsx')
 
     result_storage = pd.DataFrame({'p_ppa_comp': agg_power_profile, 'p_comp_load': load_profile.tolist()})
 
