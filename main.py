@@ -228,7 +228,7 @@ def update_output(contents, file_name):
 )
 def generate_load_file(n_clicks, yearly_demand):
     #load csv file from input_data folder
-    orig_hourly_demand = pd.read_csv('input_data\power_hourly_braeuer15.csv', header=None)
+    orig_hourly_demand = pd.read_csv(r'input_data\power_hourly_braeuer15.csv', header=None)
 
     # rescale so that the sum of the demand is the same as the total demand
     yearly_demand_timeseries = orig_hourly_demand * yearly_demand * 1000 / orig_hourly_demand.sum()
