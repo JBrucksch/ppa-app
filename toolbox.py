@@ -1,4 +1,5 @@
 import numpy as np
+import requests
 import pandas as pd
 import json
 import plotly.graph_objects as go
@@ -44,7 +45,7 @@ def create_demand_timeseries(demand):
     yearly_demand_timeseries = np.tile(hourly_demand, days_per_year)
 
     #load csv file from input_data folder
-    orig_hourly_demand = pd.read_csv('power_hourly_braeuer15.csv', header=None)
+    orig_hourly_demand = pd.read_csv('input_data\power_hourly_braeuer15.csv', header=None)
 
     # rescale so that the sum of the demand is the same as the total demand
     yearly_demand_timeseries = orig_hourly_demand * total_demand / orig_hourly_demand.sum()
@@ -54,7 +55,7 @@ def create_demand_timeseries(demand):
 
 def get_irradiance(lat, lon, size, tech):
 
-    f = open("weather_data.pkl", "rb")
+    f = open("input_data\weather_data.pkl", "rb")
     weather_data = pickle.load(f)
     f.close()
 
@@ -461,7 +462,7 @@ def get_optimization_result(input_dict, t_horizon, pp_data, load_profile, ps_boo
     df_to_save = pd.DataFrame({'load': load_profile, 'pv': energy_from_ppa_df['pv'], 'wind': energy_from_ppa_df['wind'], 
                                'to_bat': energy_to_battery_ts, 'from_bat': energy_from_battery_ts, 'to_grid': energy_to_grid_ts})
     # save that df
-    #df_to_save.to_excel('results.xlsx')
+    df_to_save.to_excel('results.xlsx')
 
     result_storage = pd.DataFrame({'p_ppa_comp': agg_power_profile, 'p_comp_load': load_profile.tolist()})
 
