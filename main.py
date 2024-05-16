@@ -15,17 +15,16 @@ from pages.output import output_info
 import base64
 import io
 import copy
+import csv
 
 app = dash.Dash(__name__, suppress_callback_exceptions=True,
            external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP])
 
-server = app.server
-
 app.title = 'PPA-APP'
 
-#######################################################################################################################
+####################################################################################################################
 # Layout
-#######################################################################################################################
+####################################################################################################################
 
 app.layout = html.Div([
     
@@ -33,6 +32,8 @@ app.layout = html.Div([
         header_info()
     ,className='header-box',align='center'
     ),
+
+    dcc.Store(id='load-profile-data-store'),
 
     dbc.Row([
         input_info()
@@ -45,12 +46,22 @@ app.layout = html.Div([
     ),
     ])
 
+server = app.server
 
 #######################################################################################################################
 # CALLBACKS
 #######################################################################################################################
 pp_data = {}
 
+# @app.callback(
+#     Output("alert-1", "is_open"),
+#     [Input("alert-1", "n_clicks")],
+#     [State("alert-1", "is_open")],
+# )
+# def toggle_alert(n, is_open):
+#     if n:
+#         return not is_open
+#     return is_open
 
 @app.callback(
     Output("map-click-point", "position"),
@@ -154,7 +165,6 @@ def delete_power_profile(_):
     i = ctx.context_value.get()["inputs_list"][0]["id"]["ind"]  # gets the key of the element to be deleted
     global pp_data
     pp_data.pop(i)
-    # print(pp_data.keys())
     return 0, []
 
 
@@ -201,6 +211,7 @@ def peak_shaving_choose(on):
 
 @app.callback(
     Output("upload-load-profile-message", "children", allow_duplicate=True),
+    Output("load-profile-data-store", "data"),
     Input("upload-load-profile-data", "contents"),
     Input("upload-load-profile-data", "filename"),
     prevent_initial_call=True
@@ -211,11 +222,17 @@ def update_output(contents, file_name):
     else:
         content_type, content_string = contents.split(',')
         decoded = base64.b64decode(content_string)
-        load_profile = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
+
+        load_profile = pd.read_csv(io.StringIO(decoded.decode('utf-8')), sep=',')
+        if len(load_profile.columns) != 2:
+            load_profile = pd.read_csv(io.StringIO(decoded.decode('utf-8')), sep=';')
+            if len(load_profile.columns) != 2:
+                return html.Div("File mismatch.", style={"color": "red"}), None
+                    
         if len(load_profile) < 1000:
             return html.Div("File should have more enteries.", style={"color": "red"}), None
         else:
-            return f"{file_name} uploaded successfully", contents
+            return f"{file_name} uploaded successfully", load_profile.to_json()
 
 @app.callback(
     Output("upload-load-profile-message", "children", allow_duplicate=True),
@@ -228,7 +245,7 @@ def update_output(contents, file_name):
 )
 def generate_load_file(n_clicks, yearly_demand):
     #load csv file from input_data folder
-    orig_hourly_demand = pd.read_csv('power_hourly_braeuer15.csv', header=None)
+    orig_hourly_demand = pd.read_csv('input_data\power_hourly_braeuer15.csv', header=None)
 
     # rescale so that the sum of the demand is the same as the total demand
     yearly_demand_timeseries = orig_hourly_demand * yearly_demand * 1000 / orig_hourly_demand.sum()
@@ -296,7 +313,7 @@ def generate_load_file(n_clicks, yearly_demand):
     State("interest_rate", "value"),
     State("horizon", "value"),
     # State("power-profile-store", "data"),  todo remove it from the structure too
-    State("upload-load-profile-data", "contents"),
+    State("load-profile-data-store", "data"),
     State('electricity_demand_boolean_switch', 'on'),
     State('peak_shaving_boolean_switch', 'on'),
     State("generate_load_file_store", "data"),
@@ -340,11 +357,15 @@ def collect_input_data(n_clicks,  # checkbox_1_value,
 
     if demand_boolean:
         load_profile = pd.read_json(load_profile_store)
-    else:
-        content_type, content_string = load_profile.split(',')
-        decoded = base64.b64decode(content_string)
-        load_profile = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
+    else: 
+        load_profile = pd.read_json(load_profile)
         load_profile.set_index(load_profile.columns[0], inplace=True)
+        # content_type, content_string = load_profile.split(',')
+        # decoded = base64.b64decode(content_string)
+        # #load_profile = pd.read_csv(io.StringIO(decoded.decode('utf-8')), delimiter=delimiter)
+        # delimiter = ';' if ';' in load_profile.columns[0] else ','
+        # load_profile[load_profile.columns[0]] = load_profile[load_profile.columns[0]].str.split(delimiter).str[0]
+        # load_profile.set_index(load_profile.columns[0], inplace=True)
     # load_profile = pd.read_csv("sekurit_total_kW1_2019_2022.csv", index_col=0)
     load_profile = edit_series(load_profile)
     load_profile[load_profile > 30000] = 5000
